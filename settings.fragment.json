@@ -1,0 +1,16 @@
+{
+  "_comment": "Merge this 'hooks' block into the target project's .claude/settings.json. install.sh does this for you. Paths assume the railguards files are copied under .claude/railguards/ in the target project.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/railguards/hooks/prior-art-guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

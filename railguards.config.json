@@ -1,0 +1,14 @@
+{
+  "$schema": "./railguards.schema.json",
+  "project": "example-project",
+  "prior_art": {
+    "watch_dirs": ["/services/", "/src/", "/app/api/", "/components/", "/lib/"],
+    "known_sources": [],
+    "domain_url_fragments": []
+  },
+  "qa_gate": {
+    "tiers": ["critical", "standard", "minor"],
+    "min_break_it": { "critical": 5, "standard": 3, "minor": 0 },
+    "require_functions": { "critical": 1, "standard": 1, "minor": 0 }
+  }
+}
