@@ -2,17 +2,17 @@
 """QA-report gate — PORTABLE EDITION (core schema validation).
 
 prior-art-checked: this is a NEW standalone railguards-toolkit file in a separate
-repo (claude-railguards), not a duplicate of any compliance-engine code; it is the
+repo (claude-railguards), not a duplicate of any other project code; it is the
 portable extraction OF that project's scripts/qa_gate.py, built to run anywhere.
 
-Validates a `.qa_report.json` against the universal schema the PlotDetect QA
+Validates a `.qa_report.json` against the universal schema a production QA
 discipline relies on, with the thresholds read from `railguards.config.json`:
 
   qa_gate.tiers              — allowed tier names.
   qa_gate.min_break_it       — required break-it scenarios per tier.
   qa_gate.require_functions  — required documented functions per tier.
 
-This is the project-agnostic core. The full PlotDetect gate adds optional layers
+This is the project-agnostic core. The full upstream gate adds optional layers
 (liability scan, test-baseline ratchet, Python/TS adversarial scanners, diff
 coverage) — those are project-coupled and shipped separately/behind config.
 

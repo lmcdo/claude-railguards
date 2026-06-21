@@ -1,10 +1,10 @@
-# claude-railguards (PoC)
+# claude-railguards
 
-Portable extraction of the PlotDetect/ComplianceEngine code-safety railguards, so the
+Portable extraction of a production code-safety railguard system, so the
 same discipline can be dropped into any project. See the design doc:
 `~/.claude/plans/meta-railguards-portability-2026-06.md`.
 
-## What's in this PoC
+## What's in it
 The 3 highest-value, lowest-coupling pieces, made config-driven:
 
 | Piece | What it does | Coupling externalized to |
@@ -15,7 +15,7 @@ The 3 highest-value, lowest-coupling pieces, made config-driven:
 | `git-hooks/pre-commit` | Branch guard + secrets scan (keys, DB-url-with-password) + large-file gate | `git_hooks.protected_branches`, `max_file_bytes` |
 | `git-hooks/post-commit` | Stamps the commit hash into `.qa_report.json` (no amend) | none |
 
-All project specifics live in **`railguards.config.json`** — nothing PlotDetect-specific
+All project specifics live in **`railguards.config.json`** — nothing project-specific
 is reachable in the code.
 
 ## Install — as a Claude Code plugin (recommended)

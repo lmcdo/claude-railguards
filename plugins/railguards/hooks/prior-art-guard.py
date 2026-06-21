@@ -4,7 +4,7 @@
 Stops the LLM re-implementing capability that already exists (the structural
 "build new instead of discover+reuse" failure). Runs as CODE, not a rule.
 
-This is the project-agnostic version of the PlotDetect prior-art guard: the
+This is the project-agnostic version of a production prior-art guard: the
 mechanism (git-grep the repo for the change's concern, score candidate files,
 block with a forced `prior-art-checked:` ack) is generic; the three coupling
 points are read from ``railguards.config.json``:
