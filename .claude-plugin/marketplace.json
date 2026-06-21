@@ -1,0 +1,18 @@
+{
+  "name": "claude-railguards",
+  "owner": {
+    "name": "lawrence mcdonell",
+    "email": "lawrence.mcdonell@gmail.com"
+  },
+  "description": "Deterministic pre-write governance for AI coding agents — rules files request, this enforces. Anti-duplication prior-art guard, pre-implementation gate, QA-report-as-a-merge-gate.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "railguards",
+      "source": "./plugins/railguards",
+      "description": "Blocks the agent from re-implementing existing capability (PreToolUse prior-art guard), enforces a pre-implementation investigation gate, and validates a QA-report contract before risky changes. Git-side guards (branch/secrets/large-file/hash-stamp) install via the bundled bin/install-git-hooks.",
+      "category": "workflow",
+      "keywords": ["guardrails", "hooks", "qa", "anti-duplication", "governance", "safety"]
+    }
+  ]
+}

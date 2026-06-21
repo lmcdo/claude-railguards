@@ -18,13 +18,37 @@ The 3 highest-value, lowest-coupling pieces, made config-driven:
 All project specifics live in **`railguards.config.json`** — nothing PlotDetect-specific
 is reachable in the code.
 
-## Install into a project
+## Install — as a Claude Code plugin (recommended)
+```text
+/plugin marketplace add lmcdo/claude-railguards     # this repo
+/plugin install railguards@claude-railguards
+```
+That wires the **Claude-side** railguards (prior-art PreToolUse guard, pre-impl skill,
+`/qa-gate` command). Git hooks can't ship in a plugin, so add the **git-side** guards once
+per repo:
+```bash
+install-git-hooks            # from the plugin's bin/, run at your project root
+```
+Then edit `railguards.config.json` (`prior_art.known_sources`, `git_hooks`).
+
+## Install — without the plugin system (copy + wire)
 ```bash
 ./install.sh /path/to/target-project
-# then edit target-project/railguards.config.json (known_sources, watch_dirs)
 ```
-This copies the files under `.claude/railguards/`, seeds `railguards.config.json`, and
-merges the PreToolUse hook into `.claude/settings.json` (idempotent).
+Copies the files under `.claude/railguards/`, seeds `railguards.config.json`, merges the
+PreToolUse hook into `.claude/settings.json`, and installs the git hooks (idempotent).
+
+## Layout (marketplace repo)
+```
+.claude-plugin/marketplace.json      ← lists the plugin (no Anthropic gate; anyone can add)
+plugins/railguards/
+  .claude-plugin/plugin.json
+  hooks/hooks.json + hooks/prior-art-guard.py   ← PreToolUse guard
+  skills/pre-impl/SKILL.md                       ← pre-impl gate
+  scripts/qa_gate.py + commands/qa-gate.md       ← QA-report gate + /qa-gate
+  git-hooks/{pre-commit,post-commit}             ← installed by bin/install-git-hooks
+  bin/install-git-hooks  lib/config_get.py  railguards.config.json
+```
 
 ## Not yet ported (later phases — see plan)
 **P2 DONE** (branch guard, secrets scan, large-file gate, hash-stamp). Still to do: bracket-lint

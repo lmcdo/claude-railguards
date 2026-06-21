@@ -1,0 +1,8 @@
+{
+  "name": "railguards",
+  "description": "Deterministic pre-write governance for AI coding agents: anti-duplication prior-art guard (PreToolUse), pre-implementation investigation skill, and a QA-report-as-a-gate validator. Git-side guards install separately via bin/install-git-hooks.",
+  "version": "0.1.0",
+  "author": { "name": "lawrence mcdonell", "email": "lawrence.mcdonell@gmail.com" },
+  "license": "MIT",
+  "keywords": ["guardrails", "hooks", "qa", "anti-duplication", "pre-impl", "governance"]
+}

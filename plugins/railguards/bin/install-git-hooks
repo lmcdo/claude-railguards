@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Installs the railguards git-side guards (branch guard, secrets scan, large-file
+# gate, hash-stamp) into the CURRENT git repo. The Claude-side hooks ship in the
+# plugin; git hooks cannot, so run this once per repo.
+#
+# Usage (from your project root):  install-git-hooks
+# Honors an existing core.hooksPath (won't clobber).
+set -euo pipefail
+
+# Resolve this script's dir even when invoked via the plugin's bin/ on PATH.
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_ROOT="$(cd "$SELF/.." && pwd)"
+
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO" ]; then
+  echo "not inside a git repository — cd into your project first" >&2
+  exit 1
+fi
+
+mkdir -p "$REPO/.claude/railguards/lib" "$REPO/.githooks"
+cp "$PLUGIN_ROOT/lib/config_get.py" "$REPO/.claude/railguards/lib/"
+
+if [ ! -f "$REPO/railguards.config.json" ]; then
+  cp "$PLUGIN_ROOT/railguards.config.json" "$REPO/railguards.config.json"
+  echo "seeded railguards.config.json — edit prior_art.known_sources / git_hooks for this project"
+fi
+
+EXISTING=$(git -C "$REPO" config --local core.hooksPath || true)
+for h in pre-commit post-commit; do
+  if [ -f "$REPO/.githooks/$h" ] && [ ! -f "$REPO/.githooks/.railguards-$h" ]; then
+    echo "note: .githooks/$h already exists — left untouched; merge from $PLUGIN_ROOT/git-hooks/$h"
+  else
+    cp "$PLUGIN_ROOT/git-hooks/$h" "$REPO/.githooks/$h"
+    chmod +x "$REPO/.githooks/$h"
+    : > "$REPO/.githooks/.railguards-$h"
+  fi
+done
+
+if [ -z "$EXISTING" ]; then
+  git -C "$REPO" config core.hooksPath .githooks
+  echo "set core.hooksPath=.githooks — git-side guards active"
+elif [ "$EXISTING" != ".githooks" ]; then
+  echo "note: core.hooksPath is '$EXISTING' — point it at .githooks or merge the hooks manually"
+else
+  echo "core.hooksPath already .githooks — git-side guards active"
+fi
