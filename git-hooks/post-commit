@@ -1,0 +1,21 @@
+#!/bin/sh
+# claude-railguards post-commit — stamps the current commit hash into .qa_report.json
+# (working copy only — no amend, which would create a circular-hash problem). The
+# qa_gate accepts a hash from a recent commit, so the next push validates.
+# Generic: only runs when a .qa_report.json with a commit_hash field exists.
+
+QA_REPORT=".qa_report.json"
+[ -f "$QA_REPORT" ] || exit 0
+
+GITDIR=$(git rev-parse --git-dir)
+[ -d "$GITDIR/rebase-merge" ] && exit 0
+[ -d "$GITDIR/rebase-apply" ] && exit 0
+[ -f "$GITDIR/MERGE_HEAD" ] && exit 0
+
+HASH=$(git rev-parse --short HEAD)
+if grep -q '"commit_hash"' "$QA_REPORT" 2>/dev/null; then
+  CURRENT_HASH=$(grep '"commit_hash"' "$QA_REPORT" | sed 's/.*: *"\([^"]*\)".*/\1/')
+  if [ "$CURRENT_HASH" != "$HASH" ]; then
+    sed -i "s/\"commit_hash\": *\"[^\"]*\"/\"commit_hash\": \"$HASH\"/" "$QA_REPORT"
+  fi
+fi

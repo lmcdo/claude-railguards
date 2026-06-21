@@ -10,5 +10,9 @@
     "tiers": ["critical", "standard", "minor"],
     "min_break_it": { "critical": 5, "standard": 3, "minor": 0 },
     "require_functions": { "critical": 1, "standard": 1, "minor": 0 }
+  },
+  "git_hooks": {
+    "protected_branches": ["main", "master"],
+    "max_file_bytes": 2097152
   }
 }

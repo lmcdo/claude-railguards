@@ -15,11 +15,34 @@ if [ -z "$TARGET" ] || [ ! -d "$TARGET" ]; then
 fi
 
 mkdir -p "$TARGET/.claude/railguards/hooks" "$TARGET/.claude/railguards/scripts" \
-         "$TARGET/.claude/skills/pre-impl"
+         "$TARGET/.claude/railguards/lib" "$TARGET/.claude/skills/pre-impl"
 
 cp "$HERE/hooks/prior-art-guard.py"  "$TARGET/.claude/railguards/hooks/"
 cp "$HERE/scripts/qa_gate.py"        "$TARGET/.claude/railguards/scripts/"
+cp "$HERE/lib/config_get.py"         "$TARGET/.claude/railguards/lib/"
 cp "$HERE/skills/pre-impl/SKILL.md"  "$TARGET/.claude/skills/pre-impl/"
+
+# ── Git hooks (branch guard, secrets scan, large-file gate, hash-stamp) ──────
+# Installed under .githooks/ and activated via core.hooksPath. If the project
+# already uses a custom hooksPath, we DON'T override it — we copy the hooks and
+# print an instruction instead, so we never clobber an existing hook setup.
+mkdir -p "$TARGET/.githooks"
+EXISTING_HOOKSPATH=$(git -C "$TARGET" config --local core.hooksPath || true)
+for h in pre-commit post-commit; do
+  if [ -f "$TARGET/.githooks/$h" ] && [ ! -f "$TARGET/.githooks/.railguards-$h" ]; then
+    echo "note: $TARGET/.githooks/$h already exists — left untouched; see $HERE/git-hooks/$h to merge"
+  else
+    cp "$HERE/git-hooks/$h" "$TARGET/.githooks/$h"
+    chmod +x "$TARGET/.githooks/$h"
+    : > "$TARGET/.githooks/.railguards-$h"
+  fi
+done
+if [ -z "$EXISTING_HOOKSPATH" ]; then
+  git -C "$TARGET" config core.hooksPath .githooks
+  echo "set core.hooksPath=.githooks"
+elif [ "$EXISTING_HOOKSPATH" != ".githooks" ]; then
+  echo "note: core.hooksPath is '$EXISTING_HOOKSPATH' (not .githooks) — point it at .githooks or merge the hooks manually"
+fi
 
 # Seed a project config if none exists (the user fills in the coupling points).
 if [ ! -f "$TARGET/railguards.config.json" ]; then
