@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pytest
+        run: pip install pytest
+      - name: Run tests
+        run: python -m pytest tests/ -q
+      - name: Validate plugin + marketplace manifests
+        run: |
+          python - <<'PY'
+          import json, sys
+          for f in [".claude-plugin/marketplace.json",
+                    "plugins/railguards/.claude-plugin/plugin.json",
+                    "plugins/railguards/hooks/hooks.json",
+                    "plugins/railguards/railguards.config.json"]:
+              json.load(open(f))
+              print("ok", f)
+          m = json.load(open(".claude-plugin/marketplace.json"))
+          assert m["name"] and m["owner"]["name"] and m["plugins"], "marketplace missing required fields"
+          p = m["plugins"][0]
+          assert p["name"] and p["source"], "plugin needs name + source"
+          print("manifests valid")
+          PY
