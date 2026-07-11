@@ -2,7 +2,7 @@
   "name": "claude-railguards",
   "owner": {
     "name": "lawrence mcdonell",
-    "email": "lawrence.mcdonell@gmail.com"
+    "email": "info@plotdetect.com.au"
   },
   "description": "Deterministic pre-write governance for AI coding agents — rules files request, this enforces. Anti-duplication prior-art guard, pre-implementation gate, QA-report-as-a-merge-gate.",
   "version": "0.1.0",
