@@ -1,8 +1,17 @@
 # claude-railguards
 
 Portable extraction of a production code-safety railguard system, so the
-same discipline can be dropped into any project. See the design doc:
-`~/.claude/plans/meta-railguards-portability-2026-06.md`.
+same discipline can be dropped into any project.
+
+## What it looks like when it fires
+
+The prior-art guard runs *before* the agent's Write/Edit lands. When the agent
+reaches for something the repo already has, the edit is blocked — not warned:
+
+![prior-art guard blocking a duplicate write](docs/prior-art-guard.gif)
+
+No `prior-art-checked:` line means the write stays blocked. The agent can't
+silently duplicate, and every override is logged to `.claude/prior-art-decisions.log`.
 
 ## What's in it
 The 3 highest-value, lowest-coupling pieces, made config-driven:
