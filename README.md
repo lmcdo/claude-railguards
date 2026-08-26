@@ -59,6 +59,32 @@ plugins/railguards/
   bin/install-git-hooks  lib/config_get.py  railguards.config.json
 ```
 
+## Pitfalls when extending these hooks
+
+**`set -e` + capturing a command's exit status.** If a hook uses `set -e` (or you add it
+while wiring in a new check), a bare failing command terminates the script immediately —
+the next line, which would have read `$?` or `${PIPESTATUS[0]}`, never runs. The hook just
+stops silently mid-block; whatever message that check was supposed to print never appears.
+It's worse for a tool whose "nothing to report" exit code is non-zero (e.g. exit 2 for "scan
+had gaps it couldn't resolve") — a *good* result then aborts the operation the hook was
+gating, with no explanation.
+
+Fix: never let the command run bare. Make it part of a compound `set -e` does not trip:
+```sh
+RESULT=0
+some_command_that_might_fail || RESULT=$?
+if [ "$RESULT" -ne 0 ]; then
+  ...
+fi
+```
+Verify it under the trap that broke it, not by reading the diff back:
+```sh
+bash -c 'set -e; some_command_that_might_fail; echo unreachable'
+```
+If `unreachable` doesn't print, the pattern still isn't safe. Each sequential check in a
+growing hook (build → lint → tests → ...) needs this independently — fixing the first
+check doesn't fix the second.
+
 ## Not yet ported (later phases — see plan)
 **P2 DONE** (branch guard, secrets scan, large-file gate, hash-stamp). Still to do: bracket-lint
 generalization; liability scan, test-baseline ratchet, db-safety, capability index (project-coupled,
